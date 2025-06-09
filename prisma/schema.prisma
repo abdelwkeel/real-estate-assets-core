@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Property {
+  PropertyID        Int       @id @default(autoincrement())
+  Name              String
+  Location          String
+  OwnerCompanyID    Int
+  Status            String
+  LegalStatus       String
+  UtilizationStatus String
+  Governorate       String
+  Images            String[]
+  Documents         String[]
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  Auction           Auction[]
+  ownerCompany      Company   @relation(fields: [OwnerCompanyID], references: [CompanyID])
+}
+
+model Company {
+  CompanyID      Int        @id @default(autoincrement())
+  CompanyName    String
+  AffiliationLaw String
+  properties     Property[]
+}
+
+model Auction {
+  AuctionID          Int      @id @default(autoincrement())
+  PropertyID         Int
+  StartingPrice      Float
+  FinalPrice         Float?
+  PaymentPlan        String
+  Installments       String?
+  AppraisalCompanies String[]
+  ExpertEvaluatorID  Int
+  AuctionDocuments   String[]
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  property           Property @relation(fields: [PropertyID], references: [PropertyID])
+}
+
+model Letter {
+  LetterID       Int      @id @default(autoincrement())
+  RecipientType  String
+  DateSent       DateTime
+  AttachedFiles  String[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  Subject        String
+  OutgoingNumber String
+  RecipientName  String?
+}
+
+model BoardExtract {
+  ExtractID     Int      @id @default(autoincrement())
+  Title         String
+  Description   String
+  DateIssued    DateTime
+  AttachedFiles String[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model BoardDecision {
+  DecisionID    Int      @id @default(autoincrement())
+  Title         String
+  Content       String
+  DateIssued    DateTime
+  AttachedFiles String[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model InternalSector {
+  SectorID   Int    @id @default(autoincrement())
+  SectorName String @unique
+}
+
+model GovernmentAuthority {
+  AuthorityID   Int    @id @default(autoincrement())
+  AuthorityName String @unique
+}
