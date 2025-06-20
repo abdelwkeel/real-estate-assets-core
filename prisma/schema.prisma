@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int             @id @default(autoincrement())
+  name          String
+  email         String          @unique
+  password      String
+  role          Role            @default(USER)
+  createdAt     DateTime        @default(now())
+  BoardExtract  BoardExtract[]
+  BoardDecision BoardDecision[]
+}
+
+enum Role {
+  ADMIN
+  USER
+  SUPERADMIN
+}
+
+model BoardExtract {
+  id            Int      @id @default(autoincrement())
+  extractNumber String   @unique // رقم المستخلص
+  extractDate   DateTime // تاريخ المستخلص
+  title         String // عنوان المستخلص
+  content       String // محتوى المستخلص
+  fileUrl       String? // رابط الملف (اختياري)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  createdById   Int
+  createdBy     User     @relation(fields: [createdById], references: [id])
+}
+
+model DecisionType {
+  id        Int             @id @default(autoincrement())
+  name      String
+  decisions BoardDecision[]
+}
+
+model BoardDecision {
+  id             Int          @id @default(autoincrement())
+  title          String
+  decisionNumber String       @unique
+  description    String
+  fileUrl        String
+  decisionDate   DateTime
+  createdById    Int
+  createdBy      User         @relation(fields: [createdById], references: [id])
+  decisionTypeId Int
+  decisionType   DecisionType @relation(fields: [decisionTypeId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
